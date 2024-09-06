@@ -1,0 +1,243 @@
+﻿@model WebApplication4.Models.Claim
+
+@{
+    ViewData["Title"] = "Submit Claim";
+    var claimNumber = TempData["ClaimNumber"] as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #000 !important; /* Black background */
+            color: #FFD700 !important; /* Gold text color */
+        }
+
+        h1, h3 {
+            color: #FFD700 !important; /* Gold text color for headings */
+        }
+
+        .card {
+            background-color: #222 !important; /* Dark background for cards */
+            border-color: #444 !important; /* Dark border for cards */
+        }
+
+        .form-control, .btn {
+            color: #FFD700 !important; /* Gold text color for form controls and buttons */
+            background-color: #333 !important; /* Dark background for form controls and buttons */
+            border-color: #444 !important; /* Dark border for form controls and buttons */
+        }
+
+            .form-control::placeholder {
+                color: #FFD700 !important; /* Gold placeholder text color */
+            }
+
+        .alert-info {
+            background-color: #333 !important; /* Darker background for alert */
+            border-color: #444 !important; /* Darker border for alert */
+            color: #FFD700 !important; /* Gold text color for alert */
+        }
+
+            .alert-info .alert-link {
+                color: #FFD700 !important; /* Gold color for links in alert */
+            }
+    </style>
+</head>
+<body>
+    <form id="claimForm" asp-action="Claim" method="post" enctype="multipart/form-data">
+        <div class="container py-5">
+            <!-- Personal Details Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Personal Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="LecturerName"></label>
+                        <input asp-for="LecturerName" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Department"></label>
+                        <input asp-for="Department" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="LectureID"></label>
+                        <input asp-for="LectureID" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module and Supporting Documents Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Module Details</h3>
+                </div>
+                <div class="card-body">
+                    <div id="modulesContainer">
+                        <!-- Module entry (visible) -->
+                        <div class="module-entry">
+                            <div class="form-group">
+                                <label>Module Code</label>
+                                <input name="Modules[0].ModuleCode" class="form-control ModuleCode" />
+                            </div>
+                            <div class="form-group">
+                                <label>Module Name</label>
+                                <input name="Modules[0].ModuleName" class="form-control ModuleName" />
+                            </div>
+                            <div class="form-group">
+                                <label>Claim Type</label>
+                                <select name="Modules[0].ClaimType" class="form-control ClaimType">
+                                    <option value=""></option>
+                                    <option value="CATCH UP">CATCH UP</option>
+                                    <option value="OVERTIME">OVERTIME</option>
+                                    <option value="General Claim">General Claim</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Rate Per Hour</label>
+                                <input name="Modules[0].RatePerHour" class="form-control RatePerHour" />
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="Modules[0].Description" class="form-control Description" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Claim Amount</label>
+                                <input name="Modules[0].ClaimAmount" class="form-control ClaimAmount" />
+                            </div>
+                            <div class="form-group">
+                                <label>Date Of Claim</label>
+                                <input name="Modules[0].DateOfClaim" type="date" class="form-control DateOfClaim" />
+                            </div>
+                            <hr />
+                        </div>
+                    </div>
+
+                    <!-- Supporting Documents Section -->
+                    <div class="form-group">
+                        <label for="SupportingDocuments">Choose Supporting Documents</label>
+                        <input type="file" name="SupportingDocuments" class="form-control" id="SupportingDocuments" />
+                    </div>
+
+                    <button type="button" id="addModule" class="btn btn-secondary">Add Another Module</button>
+                    <button type="button" id="removeLastModule" class="btn btn-danger">Remove Last Module</button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit Claim</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Validation Script -->
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var moduleTemplate = document.querySelector('.module-entry').cloneNode(true);
+            moduleTemplate.style.display = 'none'; // Hide the template initially
+
+            document.getElementById('addModule').addEventListener('click', function () {
+                var newModule = moduleTemplate.cloneNode(true);
+                var moduleCount = document.querySelectorAll('.module-entry').length;
+                newModule.style.display = 'block'; // Make the new module entry visible
+                newModule.querySelectorAll('input, select').forEach(el => {
+                    el.name = el.name.replace(/\[0\]/, `[${moduleCount}]`);
+                    el.value = ''; // Clear the value for new entries
+                });
+                document.getElementById('modulesContainer').appendChild(newModule);
+            });
+
+            document.getElementById('removeLastModule').addEventListener('click', function () {
+                var modules = document.querySelectorAll('.module-entry');
+                if (modules.length > 1) { // Keep at least one module entry
+                    modules[modules.length - 1].remove();
+                } else {
+                    alert("No more modules to remove.");
+                }
+            });
+
+            // Initialize with one visible module entry if none exist
+            if (document.querySelectorAll('.module-entry').length === 0) {
+                document.getElementById('addModule').click();
+            }
+
+            // Form submission validation
+            document.getElementById('claimForm').addEventListener('submit', function (event) {
+                var isValid = true;
+                var messages = [];
+
+                // Validate personal details
+                var lecturerName = document.querySelector('input[name="LecturerName"]').value.trim();
+                var department = document.querySelector('input[name="Department"]').value.trim();
+                var lectureID = document.querySelector('input[name="LectureID"]').value.trim();
+                if (!lecturerName) {
+                    isValid = false;
+                    messages.push("Lecturer Name is required.");
+                }
+                if (!department) {
+                    isValid = false;
+                    messages.push("Department is required.");
+                }
+                if (!lectureID) {
+                    isValid = false;
+                    messages.push("Lecture ID is required.");
+                }
+
+                // Validate module entries
+                document.querySelectorAll('.module-entry').forEach((entry, index) => {
+                    var moduleCode = entry.querySelector('input[name^="Modules"]').value.trim();
+                    var moduleName = entry.querySelector('input[name^="Modules"]').value.trim();
+                    var claimType = entry.querySelector('select[name^="Modules"]').value.trim();
+                    var ratePerHour = entry.querySelector('input[name^="Modules"]').value.trim();
+                    var claimAmount = entry.querySelector('input[name^="Modules"]').value.trim();
+                    var dateOfClaim = entry.querySelector('input[name^="Modules"]').value.trim();
+
+                    if (!moduleCode || !moduleName || !claimType || !ratePerHour || !claimAmount || !dateOfClaim) {
+                        isValid = false;
+                        messages.push(`All fields in module ${index + 1} are required.`);
+                    }
+                });
+
+                // Validate supporting documents
+                var supportingDocs = document.getElementById('SupportingDocuments').files.length;
+                if (supportingDocs === 0) {
+                    isValid = false;
+                    messages.push("Supporting documents are required.");
+                }
+
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission
+                    alert(messages.join("\n"));
+                } else {
+                    // Display success message
+                    var claimNumber = '@claimNumber';
+                    if (claimNumber) {
+                        alert(`Your claim has been successfully submitted.\nClaim Number: ${claimNumber}`);
+                    } else {
+                        alert("Your claim has been successfully submitted.");
+                    }
+
+                    // Clear personal details fields
+                    document.querySelector('input[name="LecturerName"]').value = '';
+                    document.querySelector('input[name="Department"]').value = '';
+                    document.querySelector('input[name="LectureID"]').value = '';
+
+                    // Clear module entries
+                    document.querySelectorAll('.module-entry').forEach(entry => entry.remove());
+
+                    // Clear supporting documents
+                    document.getElementById('SupportingDocuments').value = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

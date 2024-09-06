@@ -1,0 +1,121 @@
+﻿@model IEnumerable<WebApplication4.Models.Claim>
+
+@{
+    ViewData["Title"] = "Manage Claims";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #000 !important;
+            color: #FFD700 !important; 
+        }
+
+        h1 {
+            color: #FFD700 !important;
+        }
+
+        table {
+            color: #FFD700 !important; 
+        }
+
+        thead th {
+            background-color: #333 !important; 
+            color: #FFD700 !important; 
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #222 !important; 
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #000 !important; 
+        }
+
+        .btn-success {
+            background-color: #FFD700 !important; 
+            border-color: #FFD700 !important; 
+            color: #000 !important; 
+        }
+
+            .btn-success:hover {
+                background-color: #e6c07e !important; 
+                border-color: #e6c07e !important;
+            }
+
+        .btn-danger {
+            background-color: #e60000 !important; 
+            border-color: #e60000 !important;
+        }
+
+            .btn-danger:hover {
+                background-color: #cc0000 !important;
+                border-color: #cc0000 !important; 
+            }
+
+        td, th {
+            border-color: #444 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Claim Number</th>
+                    <th>Lecturer Name</th>
+                    <th>Lecture ID</th>
+                    <th>Department</th>
+                    <th>Module Code</th>
+                    <th>Module Name</th>
+                    <th>Claim Type</th>
+                    <th>Rate Per Hour</th>
+                    <th>Claim Amount</th>
+                    <th>Date of Claim</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model)
+                {
+                    @foreach (var module in claim.Modules)
+                    {
+                        <tr>
+                            <td>@claim.ClaimNumber</td>
+                            <td>@claim.LecturerName</td>
+                            <td>@claim.LectureID</td>
+                            <td>@claim.Department</td>
+                            <td>@module.ModuleCode</td>
+                            <td>@module.ModuleName</td>
+                            <td>@module.ClaimType</td>
+                            <td>@module.RatePerHour</td>
+                            <td>@module.ClaimAmount</td>
+                            <td>@module.DateOfClaim.ToShortDateString()</td>
+                            <td>@claim.Status</td>
+                            <td>
+                                <form asp-action="UpdateClaimStatus" method="post" class="form-inline">
+                                    <input type="hidden" name="claimNumber" value="@claim.ClaimNumber" />
+                                    <button type="submit" name="status" value="Approved" class="btn btn-success btn-sm">Approve</button>
+                                    <button type="submit" name="status" value="Declined" class="btn btn-danger btn-sm">Decline</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

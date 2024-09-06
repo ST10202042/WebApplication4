@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Track Your Claim";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #000 !important; /* Black background */
+            color: #FFD700 !important; /* Gold text color */
+        }
+
+        h1 {
+            color: #FFD700 !important; /* Gold text color for headings */
+        }
+
+        .btn-primary {
+            background-color: #FFD700 !important; /* Gold button background */
+            border-color: #FFD700 !important; /* Gold button border */
+            color: #000 !important; /* Black button text */
+        }
+
+            .btn-primary:hover {
+                background-color: #e6c07e !important; /* Slightly darker gold on hover */
+                border-color: #e6c07e !important; /* Slightly darker gold on hover */
+            }
+
+        .form-group label {
+            color: #FFD700 !important; /* Gold color for labels */
+        }
+
+        .form-group input {
+            background-color: #333 !important; /* Dark background for input fields */
+            color: #FFD700 !important; /* Gold text color for input fields */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+
+        <form method="post">
+            <div class="form-group">
+                <label for="claimNumber">Enter your claim number:</label>
+                <input type="text" id="claimNumber" name="claimNumber" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Track Claim</button>
+        </form>
+
+        @if (ViewBag.Message != null)
+        {
+            <p>@ViewBag.Message</p>
+        }
+    </div>
+</body>
+</html>

@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CONTRACT MONTHLY CLAIM SYSTEM</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication4.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background-color: #000 !important;
+            color: #FFD700 !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFD700 !important;
+        }
+
+        a {
+            color: #000 !important;
+        }
+
+            a:hover {
+                color: #e6c07e !important;
+            }
+
+        .navbar {
+            background-color: navy !important; /* Navy blue background for the navbar */
+        }
+
+        .navbar-nav .nav-link {
+            color: #000 !important;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: cornflowerblue !important;
+            }
+
+        .footer {
+            background-color: #222 !important;
+            color: #FFD700 !important;
+        }
+
+            .footer a {
+                color: #FFD700 !important;
+            }
+
+                .footer a:hover {
+                    color: #e6c07e !important;
+                }
+
+        table {
+            color: #FFD700 !important;
+        }
+
+        thead th {
+            background-color: #333 !important;
+            color: #FFD700 !important;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #222 !important;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #000 !important;
+        }
+
+        .btn-success {
+            background-color: #FFD700 !important;
+            border-color: #FFD700 !important;
+            color: #000 !important;
+        }
+
+            .btn-success:hover {
+                background-color: #e6c07e !important;
+                border-color: #e6c07e !important;
+            }
+
+        .btn-danger {
+            background-color: #e60000 !important;
+            border-color: #e60000 !important;
+        }
+
+            .btn-danger:hover {
+                background-color: #cc0000 !important;
+                border-color: #cc0000 !important;
+            }
+
+        td, th {
+            border-color: #444 !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CONTRACT MONTHLY CLAIM SYSTEM</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Claim">Claim</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Track">Track</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Verify">Verify</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Manage">Manage</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Status">Status</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - CONTRACT MONTHLY CLAIM SYSTEM - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

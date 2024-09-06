@@ -1,0 +1,67 @@
+﻿@model WebApplication4.Models.Claim
+
+@{
+    ViewData["Title"] = "Claim Status";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    
+    <style>
+        body {
+            background-color: #000 !important; 
+            color: #FFD700 !important; 
+        }
+
+        h1 {
+            color: #FFD700 !important; /* Gold text color for headings */
+        }
+
+        .btn-primary {
+            background-color: #FFD700 !important; 
+            border-color: #FFD700 !important; /* Gold button border */
+            color: #000 !important; /* Black button text */
+        }
+
+            .btn-primary:hover {
+                background-color: #e6c07e !important; /* Slightly darker gold on hover */
+                border-color: #e6c07e !important; /* Slightly darker gold on hover */
+            }
+
+        .container {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        @if (Model != null)
+        {
+            <p>Claim Number: <strong>@Model.ClaimNumber</strong></p>
+            <p>Status: <strong>@Model.Status</strong></p>
+            <ul>
+                @foreach (var module in Model.Modules)
+                {
+                    <li>@module.ModuleName - @module.ClaimAmount</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>Claim not found.</p>
+        }
+
+        <a href="/Home/Track" class="btn btn-primary">Track Another Claim</a>
+    </div>
+</body>
+</html>
