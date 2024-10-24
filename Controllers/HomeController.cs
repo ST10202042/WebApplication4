@@ -124,7 +124,7 @@ namespace WebApplication4.Controllers
                 return View();
             }
 
-            return View("Status", claim);
+            return View("Status", claim); // Redirect to Status view if claim is found
         }
 
         public IActionResult Manage()
