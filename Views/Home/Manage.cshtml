@@ -15,51 +15,43 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
         body {
-            background-color: #000 !important;
-            color: #FFD700 !important; 
+            background-color: black !important;
+            color: #FFD700 !important; /* Yellow text for body */
         }
 
         h1 {
-            color: #FFD700 !important;
+            color: #FFD700 !important; /* Yellow color for the title */
         }
 
         table {
-            color: #FFD700 !important; 
+            background-color:black
+            color: #FFD700 !important; /* Yellow text for table content */
         }
 
         thead th {
-            background-color: #333 !important; 
-            color: #FFD700 !important; 
+            background-color: #333 !important;
+            color: #FFD700 !important; /* Yellow headers */
         }
 
         tbody tr:nth-child(even) {
-            background-color: #222 !important; 
+            background-color: blue !important;
         }
 
         tbody tr:nth-child(odd) {
-            background-color: #000 !important; 
+            background-color: green !important;
         }
 
         .btn-success {
-            background-color: #FFD700 !important; 
-            border-color: #FFD700 !important; 
-            color: #000 !important; 
+            background-color: #FFD700 !important; /* Yellow background for approve button */
+            border-color: #FFD700 !important;
+            color: #000 !important; /* Black text for approve button */
         }
-
-            .btn-success:hover {
-                background-color: #e6c07e !important; 
-                border-color: #e6c07e !important;
-            }
 
         .btn-danger {
-            background-color: #e60000 !important; 
+            background-color: #e60000 !important;
             border-color: #e60000 !important;
+            color: #fff !important; /* White text for decline button */
         }
-
-            .btn-danger:hover {
-                background-color: #cc0000 !important;
-                border-color: #cc0000 !important; 
-            }
 
         td, th {
             border-color: #444 !important;
@@ -105,17 +97,62 @@
                             <td>@module.DateOfClaim.ToShortDateString()</td>
                             <td>@claim.Status</td>
                             <td>
-                                <form asp-action="UpdateClaimStatus" method="post" class="form-inline">
-                                    <input type="hidden" name="claimNumber" value="@claim.ClaimNumber" />
-                                    <button type="submit" name="status" value="Approved" class="btn btn-success btn-sm">Approve</button>
-                                    <button type="submit" name="status" value="Declined" class="btn btn-danger btn-sm">Decline</button>
-                                </form>
-                            </td>
+    <form asp-action="UpdateClaimStatus" method="post" class="form-inline">
+        <input type="hidden" name="ClaimNumber" value="@claim.ClaimNumber" />
+        <input type="hidden" id="status-@claim.ClaimNumber" name="status" value="" />
+        <button type="button" class="btn btn-success btn-sm" onclick="setStatus('@claim.ClaimNumber', 'Approved')">Approve</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="setStatus('@claim.ClaimNumber', 'Declined')">Decline</button>
+    </form>
+</td>
+
                         </tr>
                     }
                 }
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var claimData = JSON.parse(localStorage.getItem('claimData'));
+
+            if (claimData) {
+                var tbody = document.querySelector('tbody');
+                claimData.Modules.forEach(function (module) {
+                    var row = document.createElement('tr');
+                    row.innerHTML =
+                        `<td>${generateClaimNumber()}</td>
+                                 <td>${claimData.LecturerName}</td>
+                                 <td>${claimData.LectureID}</td>
+                                 <td>${claimData.Department}</td>
+                                 <td>${module.ModuleCode}</td>
+                                 <td>${module.ModuleName}</td>
+                                 <td>${module.ClaimType}</td>
+                                 <td>${module.RatePerHour}</td>
+                                 <td>${module.ClaimAmount}</td>
+                                 <td>${module.DateOfClaim}</td>
+                                 <td>Pending</td>
+                                 <td>
+                                     <button type="button" class="btn btn-success btn-sm" onclick="approveClaim()">Approve</button>
+                                     <button type="button" class="btn btn-danger btn-sm" onclick="declineClaim()">Decline</button>
+                                 </td>`;
+                    tbody.appendChild(row);
+                });
+            }
+
+            function generateClaimNumber() {
+                return Math.floor(Math.random() * 10000);
+            }
+
+            window.approveClaim = function () {
+                alert("Claim approved!");
+            };
+
+            window.declineClaim = function () {
+                alert("Claim declined!");
+            };
+        });
+    </script>
+
 </body>
 </html>

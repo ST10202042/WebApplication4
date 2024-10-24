@@ -140,105 +140,126 @@
     </form>
 
     <!-- Validation Script -->
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-            var moduleTemplate = document.querySelector('.module-entry').cloneNode(true);
-            moduleTemplate.style.display = 'none'; // Hide the template initially
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        var moduleTemplate = document.querySelector('.module-entry').cloneNode(true);
+        moduleTemplate.style.display = 'none'; // Hide the template initially
 
-            document.getElementById('addModule').addEventListener('click', function () {
-                var newModule = moduleTemplate.cloneNode(true);
-                var moduleCount = document.querySelectorAll('.module-entry').length;
-                newModule.style.display = 'block'; // Make the new module entry visible
-                newModule.querySelectorAll('input, select').forEach(el => {
-                    el.name = el.name.replace(/\[0\]/, `[${moduleCount}]`);
-                    el.value = ''; // Clear the value for new entries
-                });
-                document.getElementById('modulesContainer').appendChild(newModule);
+        document.getElementById('addModule').addEventListener('click', function () {
+            var newModule = moduleTemplate.cloneNode(true);
+            var moduleCount = document.querySelectorAll('.module-entry').length;
+            newModule.style.display = 'block'; // Make the new module entry visible
+            newModule.querySelectorAll('input, select').forEach(el => {
+                el.name = el.name.replace(/\[0\]/, `[${moduleCount}]`); // Update the index for each new module
+                el.value = ''; // Clear the value for new entries
             });
+            document.getElementById('modulesContainer').appendChild(newModule);
+        });
 
-            document.getElementById('removeLastModule').addEventListener('click', function () {
-                var modules = document.querySelectorAll('.module-entry');
-                if (modules.length > 1) { // Keep at least one module entry
-                    modules[modules.length - 1].remove();
-                } else {
-                    alert("No more modules to remove.");
-                }
-            });
+        document.getElementById('removeLastModule').addEventListener('click', function () {
+            var modules = document.querySelectorAll('.module-entry');
+            if (modules.length > 1) { // Keep at least one module entry
+                modules[modules.length - 1].remove();
+            } else {
+                alert("No more modules to remove.");
+            }
+        });
 
-            // Initialize with one visible module entry if none exist
-            if (document.querySelectorAll('.module-entry').length === 0) {
-                document.getElementById('addModule').click();
+        // Initialize with one visible module entry if none exist
+        if (document.querySelectorAll('.module-entry').length === 0) {
+            document.getElementById('addModule').click();
+        }
+
+        // Form submission validation
+        document.getElementById('claimForm').addEventListener('submit', function (event) {
+            var isValid = true;
+            var messages = [];
+
+            // Validate personal details
+            var lecturerName = document.querySelector('input[name="LecturerName"]').value.trim();
+            var department = document.querySelector('input[name="Department"]').value.trim();
+            var lectureID = document.querySelector('input[name="LectureID"]').value.trim();
+            if (!lecturerName) {
+                isValid = false;
+                messages.push("Lecturer Name is required.");
+            }
+            if (!department) {
+                isValid = false;
+                messages.push("Department is required.");
+            }
+            if (!lectureID) {
+                isValid = false;
+                messages.push("Lecture ID is required.");
             }
 
-            // Form submission validation
-            document.getElementById('claimForm').addEventListener('submit', function (event) {
-                var isValid = true;
-                var messages = [];
+            // Validate module entries
+            document.querySelectorAll('.module-entry').forEach((entry, index) => {
+                var moduleCode = entry.querySelector('input[name^="Modules"]').value.trim();
+                var moduleName = entry.querySelector('input[name^="Modules"]').value.trim();
+                var claimType = entry.querySelector('select[name^="Modules"]').value.trim();
+                var ratePerHour = entry.querySelector('input[name^="Modules"]').value.trim();
+                var claimAmount = entry.querySelector('input[name^="Modules"]').value.trim();
+                var dateOfClaim = entry.querySelector('input[name^="Modules"]').value.trim();
 
-                // Validate personal details
-                var lecturerName = document.querySelector('input[name="LecturerName"]').value.trim();
-                var department = document.querySelector('input[name="Department"]').value.trim();
-                var lectureID = document.querySelector('input[name="LectureID"]').value.trim();
-                if (!lecturerName) {
+                if (!moduleCode || !moduleName || !claimType || !ratePerHour || !claimAmount || !dateOfClaim) {
                     isValid = false;
-                    messages.push("Lecturer Name is required.");
-                }
-                if (!department) {
-                    isValid = false;
-                    messages.push("Department is required.");
-                }
-                if (!lectureID) {
-                    isValid = false;
-                    messages.push("Lecture ID is required.");
-                }
-
-                // Validate module entries
-                document.querySelectorAll('.module-entry').forEach((entry, index) => {
-                    var moduleCode = entry.querySelector('input[name^="Modules"]').value.trim();
-                    var moduleName = entry.querySelector('input[name^="Modules"]').value.trim();
-                    var claimType = entry.querySelector('select[name^="Modules"]').value.trim();
-                    var ratePerHour = entry.querySelector('input[name^="Modules"]').value.trim();
-                    var claimAmount = entry.querySelector('input[name^="Modules"]').value.trim();
-                    var dateOfClaim = entry.querySelector('input[name^="Modules"]').value.trim();
-
-                    if (!moduleCode || !moduleName || !claimType || !ratePerHour || !claimAmount || !dateOfClaim) {
-                        isValid = false;
-                        messages.push(`All fields in module ${index + 1} are required.`);
-                    }
-                });
-
-                // Validate supporting documents
-                var supportingDocs = document.getElementById('SupportingDocuments').files.length;
-                if (supportingDocs === 0) {
-                    isValid = false;
-                    messages.push("Supporting documents are required.");
-                }
-
-                if (!isValid) {
-                    event.preventDefault(); // Prevent form submission
-                    alert(messages.join("\n"));
-                } else {
-                    // Display success message
-                    var claimNumber = '@claimNumber';
-                    if (claimNumber) {
-                        alert(`Your claim has been successfully submitted.\nClaim Number: ${claimNumber}`);
-                    } else {
-                        alert("Your claim has been successfully submitted.");
-                    }
-
-                    // Clear personal details fields
-                    document.querySelector('input[name="LecturerName"]').value = '';
-                    document.querySelector('input[name="Department"]').value = '';
-                    document.querySelector('input[name="LectureID"]').value = '';
-
-                    // Clear module entries
-                    document.querySelectorAll('.module-entry').forEach(entry => entry.remove());
-
-                    // Clear supporting documents
-                    document.getElementById('SupportingDocuments').value = '';
+                    messages.push(`All fields in module ${index + 1} are required.`);
                 }
             });
+
+            // Validate supporting documents
+            var supportingDocs = document.getElementById('SupportingDocuments').files.length;
+            if (supportingDocs === 0) {
+                isValid = false;
+                messages.push("Supporting documents are required.");
+            }
+
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission
+                alert(messages.join("\n"));
+            } else {
+                // Store claim details in localStorage for the manager's page
+                var claimData = {
+                    LecturerName: lecturerName,
+                    Department: department,
+                    LectureID: lectureID,
+                    Modules: []
+                };
+
+                document.querySelectorAll('.module-entry').forEach(entry => {
+                    claimData.Modules.push({
+                        ModuleCode: entry.querySelector('.ModuleCode').value.trim(),
+                        ModuleName: entry.querySelector('.ModuleName').value.trim(),
+                        ClaimType: entry.querySelector('.ClaimType').value.trim(),
+                        RatePerHour: entry.querySelector('.RatePerHour').value.trim(),
+                        Description: entry.querySelector('.Description').value.trim(),
+                        ClaimAmount: entry.querySelector('.ClaimAmount').value.trim(),
+                        DateOfClaim: entry.querySelector('.DateOfClaim').value.trim()
+                    });
+                });
+
+                localStorage.setItem('claimData', JSON.stringify(claimData));
+                alert("Claim submitted successfully!");
+
+                // Clear all fields after submission
+                document.querySelectorAll('.form-control').forEach(input => {
+                    input.value = ''; // Clear input fields
+                });
+
+                // Reset file input
+                document.getElementById('SupportingDocuments').value = '';
+
+                // Remove all dynamically added module entries
+                document.querySelectorAll('.module-entry').forEach(entry => {
+                    entry.remove();
+                });
+
+                // Add a new module entry for the next submission
+                document.getElementById('addModule').click();
+            }
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>

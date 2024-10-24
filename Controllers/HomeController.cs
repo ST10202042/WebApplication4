@@ -1,22 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WebApplication4.Models;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using WebApplication4.Models;
+
+using WebApplication4.Data;
+using System.Diagnostics;
 
 namespace WebApplication4.Controllers
 {
     public class HomeController : Controller
     {
+
         private readonly ILogger<HomeController> _logger;
+        private readonly ClaimContext _context;
 
-        // Static list to store claims in memory
-        private static List<Claim> claims = new List<Claim>();
-
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ClaimContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -34,40 +38,71 @@ namespace WebApplication4.Controllers
             ModelState.Clear();
             return View();
         }
+        private string GenerateClaimNumber()
+        {
+            return "CLM-" + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+        }
+
 
         [HttpPost]
-        public IActionResult Claim(Claim claim)
+        public async Task<IActionResult> Claim(Claim claim, IFormFile SupportingDocuments)
         {
             if (ModelState.IsValid)
             {
-                // Generate a unique claim number
-                var claimNumber = GenerateClaimNumber();
+                // Generate a unique claim number before adding the claim to the database
+                claim.ClaimNumber = GenerateClaimNumber();
+                claim.Status = "Pending";
+                claim.DateOfClaim = DateTime.Now;
 
-                // Store the claim number in TempData for use in JavaScript
-                TempData["ClaimNumber"] = claimNumber;
+                // Handle file upload (if any)
+                if (SupportingDocuments != null)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await SupportingDocuments.CopyToAsync(memoryStream);
+                        claim.SupportingDocuments = memoryStream.ToArray(); // Store the file as byte array
+                    }
+                }
+                if (claim.Modules == null)
+                {
+                    claim.Modules = new List<Module>();
+                }
 
-                // Simulate saving the claim data (since there's no database)
-                // For now, just redirect to the same view to show the claim number
+                // Add modules to the claim (this is assuming that claim.Modules is populated via the form)
+                foreach (var module in claim.Modules)
+                {
+                    module.ClaimNumber = claim.ClaimNumber;  // Ensure each module is associated with the correct claim
+                    module.DateOfClaim = DateTime.Now;
+                }
+
+                // Save the claim and modules to the database
+                _context.Claims.Add(claim);
+                await _context.SaveChangesAsync();  // Ensure the claim and modules are saved
+
+                // Store the claim number in TempData to display it later
+                TempData["ClaimNumber"] = claim.ClaimNumber;
+
                 return RedirectToAction("SubmitClaim");
             }
             return View(claim);
         }
 
-        private string GenerateClaimNumber()
-        {
-            // Generate a unique claim number
-            return "CLM-" + Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-        }
 
+        public IActionResult SubmitClaim()
+        {
+            // Check if ClaimNumber exists in TempData
+            ViewBag.ClaimNumber = TempData["ClaimNumber"];
+            return View();
+        }
 
 
         public IActionResult Verify(string claimNumber)
         {
-            var claim = claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
+            var claim = _context.Claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
 
             if (claim == null)
             {
-                return RedirectToAction("Track"); // Or show an error view
+                return RedirectToAction("Track");
             }
 
             return View(claim);
@@ -82,7 +117,7 @@ namespace WebApplication4.Controllers
         [HttpPost]
         public IActionResult Track(string claimNumber)
         {
-            var claim = claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
+            var claim = _context.Claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
             if (claim == null)
             {
                 ViewBag.Message = "Claim not found.";
@@ -94,35 +129,47 @@ namespace WebApplication4.Controllers
 
         public IActionResult Manage()
         {
-            // Return all claims with a "Pending" status
-            var pendingClaims = claims.Where(c => c.Status == "Pending").ToList();
+            // Retrieve all claims with a "Pending" status from the database
+            var pendingClaims = _context.Claims.Where(c => c.Status == "Pending").ToList();
+
             _logger.LogInformation($"Number of pending claims: {pendingClaims.Count}");
+
             return View(pendingClaims);
         }
-        
+
         public IActionResult Status()
         {
             return View();
         }
 
-        [HttpPost]
-        [HttpPost]
-        public IActionResult UpdateClaimStatus(string claimNumber, string status)
-        {
-            var claim = claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
-            if (claim != null && (status == "Approved" || status == "Declined"))
-            {
-                claim.Status = status;
-            }
+      [HttpPost]
+public IActionResult UpdateClaimStatus(string claimNumber, string status)
+{
+    // Find the claim by ClaimNumber
+    var claim = _context.Claims.FirstOrDefault(c => c.ClaimNumber == claimNumber);
+    
+    if (claim == null)
+    {
+        return NotFound();
+    }
 
-            return RedirectToAction("Manage");
+    // Update the status
+    claim.Status = status;
+
+    // Save changes to the database
+    _context.SaveChanges();
+
+    return Ok();
+}
+
+        public IActionResult register()
+        {
+            return View();
+        }
+        public IActionResult Login()
+        {
+            return View();
         }
 
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
