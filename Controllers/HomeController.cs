@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication4.Models;
-
 using WebApplication4.Data;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication4.Controllers
 {
@@ -170,6 +170,22 @@ public IActionResult UpdateClaimStatus(string claimNumber, string status)
         {
             return View();
         }
+       
 
+[Authorize(Roles = "Manager")]
+    public IActionResult ManageClaims()
+    {
+        // Code for managers to manage claims
+        return View();
     }
+
+    [Authorize(Roles = "Lecturer")]
+    public IActionResult ViewClaim()
+    {
+        // Code for lecturers to view their claims
+        return View();
+    }
+
+
+}
 }
